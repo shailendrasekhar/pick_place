@@ -1,86 +1,115 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import ExecuteProcess
-from ament_index_python.packages import get_package_share_directory,get_package_prefix
+from launch_ros.parameter_descriptions import ParameterValue
+from launch.substitutions import Command
 import os
+from ament_index_python.packages import get_package_share_path, get_package_prefix, get_package_share_directory
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+# from moveit_configs_utils import MoveItConfigsBuilder
+
 
 def generate_launch_description():
-    pkg_description = get_package_share_directory('robotic_arms_control')
-    urdf_file = os.path.join(pkg_description, "urdf", 'panda_arm.urdf')
 
-    mesh_pkg_share_dir = os.pathsep + os.path.join(get_package_prefix('franka_description'), 'share')
+    pkgPath = get_package_share_directory('master_panda')
 
+    pkg_panda_description = os.path.join(pkgPath, 'urdf' , 'panda.urdf.xacro')
+    square_object_sdf_file = os.path.join(pkgPath, 'urdf', 'square.urdf.xacro')
+    rviz_config = os.path.join(pkgPath, 'rviz2', 'default.rviz')
+    mesh_pkg_share_dir = os.pathsep + os.path.join(pkgPath, 'share', 'master_panda', 'models')
+    
     if 'GAZEBO_MODEL_PATH' in os.environ:
         os.environ['GAZEBO_MODEL_PATH'] += mesh_pkg_share_dir
     else:
         os.environ['GAZEBO_MODEL_PATH'] =  mesh_pkg_share_dir
 
-    
-    with open(urdf_file, 'r') as file:
-        urdf_content = file.read()
 
-    joint_state_publisher_node = Node(
-        package="joint_state_publisher_gui",
-        executable="joint_state_publisher_gui",
-        name="JSP",
-        output="screen",
+    robot_description = ParameterValue(
+        Command(['xacro ', pkg_panda_description]),
+        value_type=str
     )
-
 
     robot_state_publisher_node = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="RSP",
-        output="screen",
-        parameters=[{'robot_description': urdf_content}]
-    )
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz_gui",
-        output="screen"
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        parameters=[{'robot_description': robot_description}],
     )
 
-    start_gazebo = ExecuteProcess(
-            cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
-            output='screen')
-    
-    spawn_robot = Node(
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        # output='screen',
+        arguments=['-d', rviz_config],
+    )
+
+    gazebo_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_ros'),'launch/gazebo.launch.py')
+        )
+    )
+
+    spawn_panda = Node(
             package='gazebo_ros',
             executable='spawn_entity.py',
             name='robot_spawner',
             output='screen',
-            respawn=False,
-            arguments=["-topic", "/robot_description", "-entity", "panda_arm"])
-
+            arguments=["-topic", "/robot_description", "-entity", "panda"])
+    
+    spawn_square = Node(
+            package='gazebo_ros',
+            executable='spawn_entity.py',
+            name='spawn_square_object',
+            arguments=[
+                '-entity', 'square_object',
+                '-file', square_object_sdf_file,
+                '-x', '0.7', '-y', '0.4', '-z', '0.1'
+            ],
+            output='screen'
+        )
     
     joint_state_broadcaster_node = Node(
             package='controller_manager',
             executable='spawner',
             output='screen',
             arguments=["joint_state_broadcaster"])
-    
+
     joint_trajectory_controller_node = Node(
             package='controller_manager',
             executable='spawner',
             output='screen',
             arguments=["joint_trajectory_controller"])
     
-    rviz_bringup = [
-        joint_state_publisher_node,
-        robot_state_publisher_node,
-        rviz_node
-    ]
+    # Load MoveIt! configuration
+    # moveit_config = (
+    #     MoveItConfigsBuilder("panda_pick_place")
+    #     .robot_description(file_path="urdf/panda.urdf.xacro")
+    #     .trajectory_execution(file_path="config/gripper_moveit_controllers.yaml")
+    #     .to_moveit_configs()
+    # )
 
-    gazebo_bringup = [
+    # # Load ExecuteTaskSolutionCapability so we can execute found solutions in simulation
+    # move_group_capabilities = {
+    #     "capabilities": "move_group/ExecuteTaskSolutionCapability"
+    # }
+
+    # # Start the actual move_group node/action server
+    # run_move_group_node = Node(
+    #     package="moveit_ros_move_group",
+    #     executable="move_group",
+    #     output="screen",
+    #     parameters=[
+    #         moveit_config.to_dict(),
+    #         move_group_capabilities,
+    #     ],
+    # )
+
+    return LaunchDescription([
         robot_state_publisher_node,
-        start_gazebo,
-        spawn_robot,
+        gazebo_launch,
+        spawn_panda,
+        spawn_square,
+        rviz_node,
         joint_state_broadcaster_node,
-        joint_trajectory_controller_node
-    ]
-
-    return LaunchDescription(gazebo_bringup)
-
-if __name__ == '__main__':
-    generate_launch_description()
+        joint_trajectory_controller_node,
+        # run_move_group_node
+    ]) 

@@ -11,12 +11,25 @@
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
+
+  <depend>tf2_geometry_msgs</depend>
+  <depend>tf2_eigen</depend>
+  <depend>geometry_msgs</depend>
+
+
   <depend>gazebo_ros</depend>
-  <exec_depend>gazebo</exec_depend>
-  <exec_depend>gazebo_plugins</exec_depend>
+  <depend>gazebo_ros2_control</depend>
+  <depend>controller_manager</depend>
+  <depend>joint_state_broadcaster</depend>
+  <depend>joint_trajectory_controller</depend>
+  <!--exec_depend>gazebo</exec_depend>
+  <exec_depend>gazebo_plugins</exec_depend-->
+
+  <depend>ros2_controllers</depend>
+  <depend>xacro</depend>
 
   <export>
     <build_type>ament_python</build_type>
-    <gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}" gazebo_model_path="${prefix}/meshes"/>
+    <!--gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}" gazebo_model_path="${prefix}/meshes"/-->
   </export>
 </package>

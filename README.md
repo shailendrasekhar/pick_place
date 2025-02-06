@@ -13,5 +13,7 @@
         - colcon build
     - Launch
         - ros2 launch master_panda master_launch.py
+    - Demo with RoboticsToolBox
+        - ros2 run master_panda roboticstoolbox 0.7 0.4 0.1
     
         

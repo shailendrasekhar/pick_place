@@ -22,10 +22,16 @@ class KinematicSolver(Node):
         self.goal_positions = self.calculate_goal_joint_pos(x,y,z)
         self.get_logger().info('Controller is running and publishing to topic: {}'.format(topic_name))
 
-    def calculate_goal_joint_pos(self,x,y,z):
-        point = SE3(x,y,z)
+    def calculate_goal_joint_pos(self, x, y, z):
+        # Create transform with position and orientation
+        # This sets the end-effector to point downward
+        T = SE3(x, y, z) * SE3.Rx(180, 'deg')  # Rotate 180 degrees around X axis to point downward
+        
         robotic_arm = rtb.models.URDF.Panda()
-        ik_tran_m = robotic_arm.ikine_LM(point)
+        # Use mask to specify which DOFs to consider
+        # [1,1,1,1,1,1] means consider all position and orientation components
+        ik_tran_m = robotic_arm.ikine_LM(T, mask=[1,1,1,1,1,1])
+        
         return ik_tran_m.q.tolist() + [0.032]
 
     def timer_callback(self):

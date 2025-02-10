@@ -5,6 +5,8 @@
     - ROS2 Humble (https://docs.ros.org/en/humble/index.html)
     - Gazebo (https://classic.gazebosim.org/)
     - Intel Realsense ROS2 (https://github.com/IntelRealSense/realsense-ros)
+    - Roboticstoolbox (https://petercorke.github.io/robotics-toolbox-python/intro.html)
+    - MoveIT2 Humble (https://moveit.picknik.ai/humble/index.html)
 
 - Usage
     - Create the workspace
@@ -16,4 +18,3 @@
     - Demo with RoboticsToolBox
         - ros2 run master_panda roboticstoolbox 0.7 0.4 0.1
     
-        

@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: manipulator_moveit_config
+    relative_path: config/manipulator.urdf.xacro
+  SRDF:
+    relative_path: config/manipulator.srdf
+  CONFIG:
+    author_name: Shailendra Sekhar
+    author_email: shailendra.sekhar@ihub-data@iiit.ac.in
+    generated_timestamp: 1234456

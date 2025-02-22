@@ -1,8 +1,0 @@
-gazebo:
-  ros__parameters:
-    publish_rate: 100.0
-    use_sim_time: true
-
-gazebo_ros2_control:
-  ros__parameters:
-    use_sim_time: true 

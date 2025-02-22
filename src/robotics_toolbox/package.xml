@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>master_panda</name>
+  <name>RoboticsToolBox</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="shailendrasekhar@gmail.com">humble</maintainer>
+  <description>Using RTB to perform forward and inverse kinematics for manipulator operations.</description>
+  <maintainer email="shailendra.sekhar@ihub-data.iiit.ac.in">humble</maintainer>
   <license>Apache-2.0</license>
 
   <test_depend>ament_copyright</test_depend>

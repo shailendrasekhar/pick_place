@@ -1,55 +1,84 @@
-# joint_limits.yaml allows the dynamics properties specified in the URDF to be overwritten or augmented as needed
-# Specific joint properties can be changed with the keys [max_position, min_position, max_velocity, max_acceleration]
-# Joint limits can be turned off with [has_velocity_limits, has_acceleration_limits]
-
-# As MoveIt! does not support jerk limits, the acceleration limits provided here are the highest values that guarantee
-# that no jerk limits will be violated. More precisely, applying Euler differentiation in the worst case (from min accel
-# to max accel in 1 ms) the acceleration limits are the ones that satisfy
-# max_jerk = (max_acceleration - min_acceleration) / 0.001
+default_velocity_scaling_factor: 0.8  # Increase from 0.1 for better speed control
+default_acceleration_scaling_factor: 0.8  # Increase from 0.1 for better acceleration
 
 joint_limits:
   manipulator_joint1:
+    has_position_limits: true
+    min_position: -2.9671
+    max_position: 2.9671
     has_velocity_limits: true
-    max_velocity: 2.1750
+    max_velocity: 2.3925
     has_acceleration_limits: true
-    max_acceleration: 3.75
+    max_acceleration: 5.0
+
   manipulator_joint2:
+    has_position_limits: true
+    min_position: -1.8326
+    max_position: 1.8326
     has_velocity_limits: true
-    max_velocity: 2.1750
+    max_velocity: 2.3925
     has_acceleration_limits: true
-    max_acceleration: 1.875
+    max_acceleration: 5.0
+
   manipulator_joint3:
+    has_position_limits: true
+    min_position: -2.9671
+    max_position: 2.9671
     has_velocity_limits: true
-    max_velocity: 2.1750
+    max_velocity: 2.3925
     has_acceleration_limits: true
-    max_acceleration: 2.5
+    max_acceleration: 5.0
+
   manipulator_joint4:
+    has_position_limits: true
+    min_position: -3.1416
+    max_position: 0.088
     has_velocity_limits: true
-    max_velocity: 2.1750
+    max_velocity: 2.3925
     has_acceleration_limits: true
-    max_acceleration: 3.125
+    max_acceleration: 5.0
+
   manipulator_joint5:
+    has_position_limits: true
+    min_position: -2.9671
+    max_position: 2.9671
     has_velocity_limits: true
-    max_velocity: 2.6100
+    max_velocity: 2.871
     has_acceleration_limits: true
-    max_acceleration: 3.75
+    max_acceleration: 5.5
+
   manipulator_joint6:
+    has_position_limits: true
+    min_position: -0.0873
+    max_position: 3.8223
     has_velocity_limits: true
-    max_velocity: 2.6100
+    max_velocity: 2.871
     has_acceleration_limits: true
-    max_acceleration: 5.0
+    max_acceleration: 5.5
+
   manipulator_joint7:
+    has_position_limits: true
+    min_position: -2.9671
+    max_position: 2.9671
     has_velocity_limits: true
-    max_velocity: 2.6100
+    max_velocity: 2.871
     has_acceleration_limits: true
-    max_acceleration: 5.0
+    max_acceleration: 5.5
+
   manipulator_finger_joint1:
+    has_position_limits: true
+    min_position: 0.0
+    max_position: 0.04
     has_velocity_limits: true
-    max_velocity: 0.1
-    has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_velocity: 0.2
+    has_acceleration_limits: true
+    max_acceleration: 0.5
+
   manipulator_finger_joint2:
+    has_position_limits: true
+    min_position: 0.0
+    max_position: 0.04
     has_velocity_limits: true
-    max_velocity: 0.1
-    has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_velocity: 0.2
+    has_acceleration_limits: true
+    max_acceleration: 0.5

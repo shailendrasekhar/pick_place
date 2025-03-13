@@ -22,6 +22,7 @@
   <depend>controller_manager</depend>
   <depend>joint_state_broadcaster</depend>
   <depend>joint_trajectory_controller</depend>
+  <depend>linkattacher_msgs</depend>
 
 
   <!--exec_depend>gazebo</exec_depend>

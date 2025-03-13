@@ -1,10 +1,25 @@
 moveit_setup_assistant_config:
-  URDF:
+  urdf:
     package: manipulator_moveit_config
     relative_path: config/manipulator.urdf.xacro
-  SRDF:
+  srdf:
     relative_path: config/manipulator.srdf
-  CONFIG:
+  package_settings:
     author_name: Shailendra Sekhar
-    author_email: shailendra.sekhar@ihub-data@iiit.ac.in
-    generated_timestamp: 1234456
+    author_email: shailendra.sekhar@ihub-data.iiit.ac.in
+    generated_timestamp: 1740723111
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

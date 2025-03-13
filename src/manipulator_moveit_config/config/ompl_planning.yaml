@@ -4,50 +4,57 @@ request_adapters: >-
   default_planner_request_adapters/ResolveConstraintFrames
   default_planner_request_adapters/FixWorkspaceBounds
   default_planner_request_adapters/FixStartStateBounds
-  default_planner_request_adapters/FixStartStateCollision
-  default_planner_request_adapters/FixStartStatePathConstraints
-start_state_max_bounds_error: 0.1
+ 
+start_state_max_bounds_error: 0.5
+path_tolerance: 0.05
+resample_dt: 0.02
+min_angle_change: 0.0005
+default_workspace_bounds: 10.0
+start_state_max_dt: 2.0
+jiggle_fraction: 0.1
+max_sampling_attempts: 1000
+
 planner_configs:
   SBLkConfigDefault:
     type: geometric::SBL
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
   ESTkConfigDefault:
     type: geometric::EST
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0 setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0 setup()
     goal_bias: 0.05  # When close to goal select goal, with this probability. default: 0.05
   LBKPIECEkConfigDefault:
     type: geometric::LBKPIECE
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     border_fraction: 0.9  # Fraction of time focused on boarder default: 0.9
     min_valid_path_fraction: 0.5  # Accept partially valid moves above fraction. default: 0.5
   BKPIECEkConfigDefault:
     type: geometric::BKPIECE
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     border_fraction: 0.9  # Fraction of time focused on boarder default: 0.9
     failed_expansion_score_factor: 0.5  # When extending motion fails, scale score by factor. default: 0.5
     min_valid_path_fraction: 0.5  # Accept partially valid moves above fraction. default: 0.5
   KPIECEkConfigDefault:
     type: geometric::KPIECE
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     goal_bias: 0.05  # When close to goal select goal, with this probability. default: 0.05
     border_fraction: 0.9  # Fraction of time focused on boarder default: 0.9 (0.0,1.]
     failed_expansion_score_factor: 0.5  # When extending motion fails, scale score by factor. default: 0.5
     min_valid_path_fraction: 0.5  # Accept partially valid moves above fraction. default: 0.5
   RRTkConfigDefault:
     type: geometric::RRT
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
-    goal_bias: 0.05  # When close to goal select goal, with this probability? default: 0.05
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    goal_bias: 0.5  # When close to goal select goal, with this probability? default: 0.05
   RRTConnectkConfigDefault:
     type: geometric::RRTConnect
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
   RRTstarkConfigDefault:
     type: geometric::RRTstar
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     goal_bias: 0.05  # When close to goal select goal, with this probability? default: 0.05
     delay_collision_checking: 1  # Stop collision checking as soon as C-free parent found. default 1
   TRRTkConfigDefault:
     type: geometric::TRRT
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     goal_bias: 0.05  # When close to goal select goal, with this probability? default: 0.05
     max_states_failed: 10  # when to start increasing temp. default: 10
     temp_change_factor: 2.0  # how much to increase or decrease temp. default: 2.0
@@ -83,7 +90,7 @@ planner_configs:
     type: geometric::PDST
   STRIDEkConfigDefault:
     type: geometric::STRIDE
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     goal_bias: 0.05  # When close to goal select goal, with this probability. default: 0.05
     use_projected_distance: 0  # whether nearest neighbors are computed based on distances in a projection of the state rather distances in the state space itself. default: 0
     degree: 16  # desired degree of a node in the Geometric Near-neightbor Access Tree (GNAT). default: 16
@@ -94,7 +101,7 @@ planner_configs:
     min_valid_path_fraction: 0.2  # Accept partially valid moves above fraction. default: 0.2
   BiTRRTkConfigDefault:
     type: geometric::BiTRRT
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     temp_change_factor: 0.1  # how much to increase or decrease temp. default: 0.1
     init_temperature: 100  # initial temperature. default: 100
     frountier_threshold: 0.0  # dist new state to nearest neighbor to disqualify as frontier. default: 0.0 set in setup()
@@ -102,19 +109,19 @@ planner_configs:
     cost_threshold: 1e300  # the cost threshold. Any motion cost that is not better will not be expanded. default: inf
   LBTRRTkConfigDefault:
     type: geometric::LBTRRT
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     goal_bias: 0.05  # When close to goal select goal, with this probability. default: 0.05
     epsilon: 0.4  # optimality approximation factor. default: 0.4
   BiESTkConfigDefault:
     type: geometric::BiEST
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
   ProjESTkConfigDefault:
     type: geometric::ProjEST
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
     goal_bias: 0.05  # When close to goal select goal, with this probability. default: 0.05
   LazyPRMkConfigDefault:
     type: geometric::LazyPRM
-    range: 0.0  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
+    range: 0.5  # Max motion added to tree. ==> maxDistance_ default: 0.0, if 0.0, set on setup()
   LazyPRMstarkConfigDefault:
     type: geometric::LazyPRMstar
   SPARSkConfigDefault:

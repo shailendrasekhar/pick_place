@@ -31,6 +31,9 @@ setup(
     entry_points={
         'console_scripts': [
             "roboticstoolbox=manipulator.rtb:main",
+            "moveit2_demo=manipulator.moveit2_demo:main",
+            "sync_camera=manipulator.sync_camera:main",
+            "planning_demo=manipulator.planning_demo:main"
         ],
     },
 )

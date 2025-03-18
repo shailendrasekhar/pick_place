@@ -28,7 +28,9 @@ Create the workspace
                     - square_object_blue
 
 - Videos
-[Watch the video](videos/camera_depth_rgb_rtb.mov)
+    - Robotics ToolBox
+        - Camera with RTB
+            [![Watch the video](videos/camera_depth_rgb_rtb.mov)]
     
 
         

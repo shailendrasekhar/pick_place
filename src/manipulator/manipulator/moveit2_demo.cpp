@@ -60,7 +60,7 @@ void MTCTaskNode::setupPlanningScene()
 
   for (size_t i = 0; i < colors.size(); ++i) {
     moveit_msgs::msg::CollisionObject box;
-    box.id = colors[i] + "_box";
+    box.id = "square_object_" + colors[i];
     box.header.frame_id = "world";
     box.primitives.resize(1);
     box.primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
@@ -133,7 +133,7 @@ void MTCTaskNode::detachObjectInGazebo(const std::string& model1, const std::str
   request->model2_name = model2;
   request->link2_name = link2;
 
-  RCLCPP_INFO(LOGGER, "Attempting to attach in Gazebo: model1='%s' link1='%s' model2='%s' link2='%s'",
+  RCLCPP_INFO(LOGGER, "Attempting to detach in Gazebo: model1='%s' link1='%s' model2='%s' link2='%s'",
              model1.c_str(), link1.c_str(), model2.c_str(), link2.c_str());
 
   auto result_future = client->async_send_request(request);
@@ -145,133 +145,13 @@ void MTCTaskNode::detachObjectInGazebo(const std::string& model1, const std::str
 
   auto response = result_future.get();
   if (response->success) {
-      RCLCPP_INFO(LOGGER, "Successfully attached link in Gazebo!");
+      RCLCPP_INFO(LOGGER, "Successfully detached link in Gazebo!");
   } else {
       RCLCPP_ERROR(LOGGER, "Gazebo DETACHLINK service returned failure.");
   }
 
   return;
 }
-
-void MTCTaskNode::pickplace()
-{
-  moveit::planning_interface::PlanningSceneInterface psi;
-  auto objects = psi.getObjects(); // Get all objects in the planning scene
-
-  if (objects.empty()) {
-    RCLCPP_ERROR(LOGGER, "No objects found in the planning scene!");
-    return;
-  }
-
-  std::string selected_object_id;
-  node_->get_parameter("selected_object_id", selected_object_id);
-
-  // Check if the requested object exists
-  if (objects.find(selected_object_id) == objects.end()) {
-    RCLCPP_ERROR(LOGGER, "Object '%s' not found in the planning scene!", selected_object_id.c_str());
-    return;
-  }
-
-    RCLCPP_INFO(LOGGER, "Object '%s' selected", selected_object_id.c_str());
-
-  pick = createPick(selected_object_id);
-
-  try
-  {
-    pick.init();
-    RCLCPP_INFO(LOGGER, "Pick initialization successful...");
-  }
-  catch (mtc::InitStageException& e)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, e);
-    return;
-  }
-
-  RCLCPP_INFO(LOGGER, "Starting Pick Planning...");
-
-  if (!pick.plan(5))
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Pick planning failed");
-    return;
-  }
-  RCLCPP_INFO(LOGGER, "Pick Planning completed. Executing...");
-  pick.introspection().publishSolution(*pick.solutions().front());
-  auto pick_result = pick.execute(*pick.solutions().front());
-  if (pick_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Pick execution failed");
-    return ;
-  } else {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    attachObjectInGazebo("manipulator", "manipulator_link7", "square_object_green", "square_object_link");
-    RCLCPP_INFO(LOGGER, "Pick execution completed successfully!");
-  }
-
-
-  place = createPlace(selected_object_id);
-
-  try
-  {
-    place.init();
-    RCLCPP_INFO(LOGGER, "Place initialization successful...");
-  }
-  catch (mtc::InitStageException& e)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, e);
-    return;
-  }
-
-  RCLCPP_INFO(LOGGER, "Starting Place Planning...");
-
-  if (!place.plan(5))
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Place planning failed");
-    return;
-  }
-  RCLCPP_INFO(LOGGER, "Place Planning completed. Executing...");
-  place.introspection().publishSolution(*place.solutions().front());
-  auto place_result = place.execute(*place.solutions().front());
-  if (place_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Place execution failed");
-  } else {
-    detachObjectInGazebo("manipulator", "manipulator_link7", "square_object_green", "square_object_link");
-    RCLCPP_INFO(LOGGER, "Place execution completed successfully!");
-  }
-
-  retreat = createRetreat();
-
-  try
-  {
-    retreat.init();
-    RCLCPP_INFO(LOGGER, "Retreat initialization successful...");
-  }
-  catch (mtc::InitStageException& e)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, e);
-    return;
-  }
-
-  RCLCPP_INFO(LOGGER, "Starting Retreat Planning...");
-
-  if (!retreat.plan(5))
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Retreat planning failed");
-    return;
-  }
-  RCLCPP_INFO(LOGGER, "Retreat Planning completed. Executing...");
-  retreat.introspection().publishSolution(*retreat.solutions().front());
-  auto retreat_result = retreat.execute(*retreat.solutions().front());
-  if (retreat_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Retreat execution failed");
-  } else {
-    RCLCPP_INFO(LOGGER, "Retreat execution completed successfully!");
-  }
-
-  return;
-}
-
 
 mtc::Task MTCTaskNode::createPick(const std::string& object_id)
 {
@@ -422,13 +302,13 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
     {
       auto stage = std::make_unique<mtc::stages::MoveRelative>("lift object", cartesian_planner);
       stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-      stage->setMinMaxDistance(0.01, 0.3);
+      stage->setMinMaxDistance(0.02,0.3);
       stage->setIKFrame(hand_frame);
       stage->properties().set("marker_ns", "lift_object");
 
       geometry_msgs::msg::Vector3Stamped vec;
       vec.header.frame_id = "world";
-      vec.vector.z = 1.0;
+      vec.vector.z = 1.5;
       stage->setDirection(vec);
       task.add(std::move(stage));
     }
@@ -456,10 +336,10 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
         stage->setObject(object_id);
 
         geometry_msgs::msg::PoseStamped target_pose_msg;
-        target_pose_msg.header.frame_id = object_id;
-        target_pose_msg.pose.position.x = -0.4;
+        target_pose_msg.header.frame_id = "world";
+        target_pose_msg.pose.position.x = 0.4;
         target_pose_msg.pose.position.y = -0.4;
-        target_pose_msg.pose.position.z = 0.0;
+        target_pose_msg.pose.position.z = 0.05;
         target_pose_msg.pose.orientation.w = 1.0;
         stage->setPose(target_pose_msg);
         stage->setMonitoredStage(current_state_ptr);  
@@ -483,7 +363,7 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
       {
         auto stage =
             std::make_unique<mtc::stages::ModifyPlanningScene>("forbid collision (hand,object)");
-        stage->allowCollisions("object",
+        stage->allowCollisions(object_id,
                               task.getRobotModel()
                                   ->getJointModelGroup(hand_group_name)
                                   ->getLinkModelNamesWithCollisionGeometry(),
@@ -493,7 +373,7 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
 
       {
         auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("detach object");
-        stage->detachObject("object", hand_frame);
+        stage->detachObject(object_id, hand_frame);
         place->insert(std::move(stage));
       }
      task.add(std::move(place));
@@ -501,7 +381,7 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
   return task;
   }
 
-  mtc::Task MTCTaskNode::createRetreat()
+mtc::Task MTCTaskNode::createRetreat()
 {
     mtc::Task task;
     task.stages()->setName("Retreat task");
@@ -525,9 +405,9 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
     auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
     auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
 
-    cartesian_planner->setMaxVelocityScalingFactor(0.2);
-    cartesian_planner->setMaxAccelerationScalingFactor(0.2);
-    cartesian_planner->setStepSize(0.001);
+    cartesian_planner->setMaxVelocityScalingFactor(0.5);
+    cartesian_planner->setMaxAccelerationScalingFactor(0.5);
+    cartesian_planner->setStepSize(0.005);
 
     {
         auto stage = std::make_unique<mtc::stages::MoveRelative>("retreat", cartesian_planner);
@@ -538,7 +418,7 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
 
         geometry_msgs::msg::Vector3Stamped vec;
         vec.header.frame_id = "world";
-        vec.vector.z = 0.5;  
+        vec.vector.z = 1.5;  
         stage->setDirection(vec);
 
         task.add(std::move(stage)); 
@@ -554,15 +434,133 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
     return task;
 }
   
+void MTCTaskNode::pickplace()
+{
+  moveit::planning_interface::PlanningSceneInterface psi;
+  auto objects = psi.getObjects(); // Get all objects in the planning scene
 
+  if (objects.empty()) {
+    RCLCPP_ERROR(LOGGER, "No objects found in the planning scene!");
+    return;
+  }
+
+  std::string selected_object_id;
+  node_->get_parameter("selected_object_id", selected_object_id);
+  std::string bot = "manipulator";
+  std::string bot_link = "manipulator_link7";
+  std::string object_frame = "square_object_link";
+
+  // Check if the requested object exists
+  if (objects.find(selected_object_id) == objects.end()) {
+    RCLCPP_ERROR(LOGGER, "Object '%s' not found in the planning scene!", selected_object_id.c_str());
+    return;
+  }
+
+    RCLCPP_INFO(LOGGER, "Object '%s' selected", selected_object_id.c_str());
+
+  pick = createPick(selected_object_id);
+
+  try
+  {
+    pick.init();
+    RCLCPP_INFO(LOGGER, "Pick initialization successful...");
+  }
+  catch (mtc::InitStageException& e)
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, e);
+    return;
+  }
+
+  RCLCPP_INFO(LOGGER, "Starting Pick Planning...");
+
+  if (!pick.plan(5))
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "Pick planning failed");
+    return;
+  }
+  RCLCPP_INFO(LOGGER, "Pick Planning completed. Executing...");
+  pick.introspection().publishSolution(*pick.solutions().front());
+  auto pick_result = pick.execute(*pick.solutions().front());
+  if (pick_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "Pick execution failed");
+    return ;
+  } else {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    attachObjectInGazebo(bot, bot_link, selected_object_id, object_frame);
+    RCLCPP_INFO(LOGGER, "Pick execution completed successfully!");
+  }
+
+
+  place = createPlace(selected_object_id);
+
+  try
+  {
+    place.init();
+    RCLCPP_INFO(LOGGER, "Place initialization successful...");
+  }
+  catch (mtc::InitStageException& e)
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, e);
+    return;
+  }
+
+  RCLCPP_INFO(LOGGER, "Starting Place Planning...");
+
+  if (!place.plan(5))
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "Place planning failed");
+    return;
+  }
+  RCLCPP_INFO(LOGGER, "Place Planning completed. Executing...");
+  place.introspection().publishSolution(*place.solutions().front());
+  auto place_result = place.execute(*place.solutions().front());
+  if (place_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "Place execution failed");
+  } else {
+    detachObjectInGazebo(bot, bot_link, selected_object_id , object_frame);
+    RCLCPP_INFO(LOGGER, "Place execution completed successfully!");
+  }
+
+  retreat = createRetreat();
+
+  try
+  {
+    retreat.init();
+    RCLCPP_INFO(LOGGER, "Retreat initialization successful...");
+  }
+  catch (mtc::InitStageException& e)
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, e);
+    return;
+  }
+
+  RCLCPP_INFO(LOGGER, "Starting Retreat Planning...");
+
+  if (!retreat.plan(5))
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "Retreat planning failed");
+    return;
+  }
+  RCLCPP_INFO(LOGGER, "Retreat Planning completed. Executing...");
+  retreat.introspection().publishSolution(*retreat.solutions().front());
+  auto retreat_result = retreat.execute(*retreat.solutions().front());
+  if (retreat_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "Retreat execution failed");
+  } else {
+    RCLCPP_INFO(LOGGER, "Retreat execution completed successfully!");
+  }
+
+  return;
+}
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   options.automatically_declare_parameters_from_overrides(true);
-  options.parameter_overrides({{"selected_object_id", "green_box"}}); 
-
   auto mtc_task_node = std::make_shared<MTCTaskNode>(options);
  
   mtc_task_node->setupPlanningScene();

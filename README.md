@@ -31,7 +31,7 @@ Create the workspace
     - Robotics ToolBox
         - Camera with RTB
 
-[![Demo](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/camera_depth_rgb_rtb.gif)]
+[![Demo](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/camera_depth_rgb_rtb.gif)](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/camera_depth_rgb_rtb.mov)
 
 
         

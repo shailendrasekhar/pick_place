@@ -29,9 +29,26 @@ Create the workspace
 
 - Videos
     - Robotics ToolBox
-        - Camera with RTB
+        - Trajectory Control and Camera with RTB
+            [![Demo](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/camera_depth_rgb_rtb.gif)](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/camera_depth_rgb_rtb.mov)
 
-[![Demo](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/camera_depth_rgb_rtb.gif)](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/camera_depth_rgb_rtb.mov)
+    - Moveit2
+        - Controlling from Rviz
+            [![Demo](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/controlling_gazebo_robot_from_rviz_moveit2.gif)](https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/controlling_gazebo_robot_from_rviz_moveit2.mov)
+
+        - Pick and Place preliminary pipeline
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/green_object_pick_place_moveit2.mov">
+    <img src="https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/green_object_pick_place_moveit2.gif" width="30%">
+  </a>
+  <a href="https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/blue_object_pick_place_moveit2.mov">
+    <img src="https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/blue_object_pick_place_moveit2.gif" width="30%">
+  </a>
+  <a href="https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/red_object_pick_place_moveit2.mov">
+    <img src="https://raw.githubusercontent.com/shailendrasekhar/pick_place/main/videos/red_object_pick_place_moveit2.gif" width="30%">
+  </a>
+</p>      
 
 
         

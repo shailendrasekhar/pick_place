@@ -30,7 +30,7 @@ Create the workspace
 - Videos
     - Robotics ToolBox
         - Camera with RTB
-            [![Watch the video](videos/camera_depth_rgb_rtb.mov)]
+            <video src="videos/camera_depth_rgb_rtb.mov"></video>
     
 
         

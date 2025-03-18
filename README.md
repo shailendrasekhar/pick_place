@@ -6,14 +6,29 @@
     - Gazebo (https://classic.gazebosim.org/)
     - Intel Realsense ROS2 (https://github.com/IntelRealSense/realsense-ros)
 
+
+Create the workspace
+    - mkdir -p "workspace_name"
+    - git clone the repository.
+    - colcon build
+
 - Usage
-    - Create the workspace
-        - mkdir -p "workspace_name"
-        - git clone the repository.
-        - colcon build
-    - Launch
-        - ros2 launch master_panda master_launch.py
-    - Demo with RoboticsToolBox
-        - ros2 run master_panda roboticstoolbox 0.7 0.4 0.1
+    - RoboticsToolBox
+        - Launch
+            - ros2 launch master_panda master_launch.py
+        - Demo with RoboticsToolBox
+            - ros2 run master_panda roboticstoolbox 0.7 0.4 0.1
+    - Moveit2
+        - Launch
+            - ros2 launch manipulator gazebo.launch.py
+            - ros2 launch manipulator moveit2.launch.py object:="$object_name"
+                - $object_name:
+                    - square_object_red (default)
+                    - square_object_green 
+                    - square_object_blue
+
+- Videos
+[Watch the video](videos/rtb.webm)
     
+
         

@@ -28,7 +28,7 @@ Create the workspace
                     - square_object_blue
 
 - Videos
-[Watch the video](videos/rtb.webm)
+[Watch the video](videos/camera_depth_rtb.mov)
     
 
         

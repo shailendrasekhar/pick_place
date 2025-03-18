@@ -3,24 +3,38 @@ from launch_ros.actions import Node
 import os
 import yaml
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import TimerAction, DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.actions import TimerAction, DeclareLaunchArgument, LogInfo
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from moveit_configs_utils import MoveItConfigsBuilder
 
 
 
 def generate_launch_description():
-    # if object == "green":
-    #     selected_object = "square_object_green"
-    # elif object == "blue":
-    #     selected_object = "square_object_blue"
-    # else:
-    #     selected_object = "square_object_red"
-    
     selected_object_arg = DeclareLaunchArgument(
         "object",
         default_value="square_object_red",
     )
+
+    target_pose_x_arg = DeclareLaunchArgument(
+        "target_pose_x",
+        default_value="0.4",
+    )
+
+    target_pose_y_arg = DeclareLaunchArgument(
+        "target_pose_y",
+        default_value="-0.4",
+    )
+
+    target_pose_z_arg = DeclareLaunchArgument(
+        "target_pose_z",
+        default_value="0.05",
+    )
+
+    target_pose_w_arg = DeclareLaunchArgument(
+        "target_pose_w",
+        default_value="1.0",
+    )
+
 
 #Import all file paths
     objpkgPath = get_package_share_directory('manipulator_moveit_config')
@@ -114,7 +128,11 @@ def generate_launch_description():
             moveit_config.joint_limits,
             moveit_config.planning_pipelines,
             {"use_sim_time":True},
-            {"selected_object_id": LaunchConfiguration("object")}
+            {"selected_object_id": LaunchConfiguration("object")},
+            {"target_pose_x": LaunchConfiguration("target_pose_x")},
+            {"target_pose_y": LaunchConfiguration("target_pose_y")},
+            {"target_pose_z": LaunchConfiguration("target_pose_z")},
+            {"target_pose_w": LaunchConfiguration("target_pose_w")}
         ],
     )
 
@@ -125,6 +143,10 @@ def generate_launch_description():
  
     return LaunchDescription([    
         selected_object_arg,
+        target_pose_x_arg,
+        target_pose_y_arg,
+        target_pose_z_arg,
+        target_pose_w_arg,
         run_move_group_node,
         # delayed_rviz_node,
         TimerAction(period=5.0,actions=[moveit2_demo_node])

@@ -16,6 +16,8 @@
 #else
 #include <tf2_eigen/tf2_eigen.hpp>
 #endif
+#include <iostream>
+#include <string>
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit2_demo");
 namespace mtc = moveit::task_constructor;
@@ -30,15 +32,16 @@ public:
                           const std::string& model2, const std::string& link2);
   void detachObjectInGazebo(const std::string& model1, const std::string& link1,
                           const std::string& model2, const std::string& link2);
-  void pickplace();
+  void pickplace(const geometry_msgs::msg::PoseStamped& target_pose);
+  rclcpp::Node::SharedPtr node_; 
 private:
   mtc::Task createPick(const std::string& object_id);
   mtc::Task pick;
-  mtc::Task createPlace(const std::string& object_id);
+  mtc::Task createPlace(const std::string& object_id,const geometry_msgs::msg::PoseStamped& target_pose);
   mtc::Task place;
   mtc::Task createRetreat();
   mtc::Task retreat;
-  rclcpp::Node::SharedPtr node_;
+  // rclcpp::Node::SharedPtr node_;
 };
 
 rclcpp::node_interfaces::NodeBaseInterface::SharedPtr MTCTaskNode::getNodeBaseInterface()
@@ -274,7 +277,7 @@ mtc::Task MTCTaskNode::createPick(const std::string& object_id)
 return task;
 }
 
-mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
+mtc::Task MTCTaskNode::createPlace(const std::string& object_id,const geometry_msgs::msg::PoseStamped& target_pose)
   {
     mtc::Task task;
     task.stages()->setName("Place task");
@@ -335,13 +338,8 @@ mtc::Task MTCTaskNode::createPlace(const std::string& object_id)
         stage->properties().set("marker_ns", "place_pose");
         stage->setObject(object_id);
 
-        geometry_msgs::msg::PoseStamped target_pose_msg;
-        target_pose_msg.header.frame_id = "world";
-        target_pose_msg.pose.position.x = 0.4;
-        target_pose_msg.pose.position.y = -0.4;
-        target_pose_msg.pose.position.z = 0.05;
-        target_pose_msg.pose.orientation.w = 1.0;
-        stage->setPose(target_pose_msg);
+        
+        stage->setPose(target_pose);
         stage->setMonitoredStage(current_state_ptr);  
 
         auto wrapper = std::make_unique<mtc::stages::ComputeIK>("place pose IK", std::move(stage));
@@ -434,7 +432,7 @@ mtc::Task MTCTaskNode::createRetreat()
     return task;
 }
   
-void MTCTaskNode::pickplace()
+void MTCTaskNode::pickplace(const geometry_msgs::msg::PoseStamped& target_pose)
 {
   moveit::planning_interface::PlanningSceneInterface psi;
   auto objects = psi.getObjects(); // Get all objects in the planning scene
@@ -492,7 +490,7 @@ void MTCTaskNode::pickplace()
   }
 
 
-  place = createPlace(selected_object_id);
+  place = createPlace(selected_object_id,target_pose);
 
   try
   {
@@ -562,9 +560,23 @@ int main(int argc, char** argv)
   rclcpp::NodeOptions options;
   options.automatically_declare_parameters_from_overrides(true);
   auto mtc_task_node = std::make_shared<MTCTaskNode>(options);
+
+  float target_pose_x, target_pose_y, target_pose_z, target_pose_w;
+  mtc_task_node->node_->get_parameter("target_pose_x", target_pose_x);
+  mtc_task_node->node_->get_parameter("target_pose_y", target_pose_y);
+  mtc_task_node->node_->get_parameter("target_pose_z", target_pose_z);
+  mtc_task_node->node_->get_parameter("target_pose_w", target_pose_w);
+
+  geometry_msgs::msg::PoseStamped target_pose;
+  target_pose.header.frame_id = "world";
+  target_pose.pose.position.x = target_pose_x;
+  target_pose.pose.position.y = target_pose_y;
+  target_pose.pose.position.z = target_pose_z;
+  target_pose.pose.orientation.w = target_pose_w;
+
  
   mtc_task_node->setupPlanningScene();
-  mtc_task_node->pickplace();
+  mtc_task_node->pickplace(target_pose);
 
   rclcpp::shutdown();
   return 0;
